@@ -142,7 +142,10 @@
                     if (data.active && data.kaggle_url) {
                         dot.classList.add("active");
                         text.textContent = "✅ Tool Active — Use Karo!";
-                        frame.src = data.kaggle_url;
+                        // Sirf tab src set karo jab pehli baar load ho
+                        if (frame.src !== data.kaggle_url) {
+                            frame.src = data.kaggle_url;
+                        }
                         frame.style.display = "block";
                         offline.style.display = "none";
                     } else {
