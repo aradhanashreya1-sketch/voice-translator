@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎙️ Voice Translator Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #e94560, #4ecca3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        .status-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e94560;
+            animation: pulse 2s infinite;
+        }
+        .status-dot.active {
+            background: #4ecca3;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .frame-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+            border-radius: 12px;
+        }
+        .offline-msg {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .offline-msg h2 {
+            color: #e94560;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        .offline-msg p {
+            color: #aaa;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: linear-gradient(90deg, #e94560, #c73652);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+        .btn:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Voice Translator Pro</h1>
+        <p class="subtitle">
+            Apni awaaz do → Language chuno → Cloned voice mein translation pao!
+        </p>
+
+        <div class="status-bar">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusText">Checking status...</span>
+        </div>
+
+        <div class="frame-container">
+            <div id="toolContainer">
+                <div class="offline-msg" id="offlineMsg">
+                    <h2>⚠️ Tool Abhi Offline Hai</h2>
+                    <p>
+                        Tool ko start karne ke liye thodi der mein dobara try karo.<br>
+                        Agar problem rahe toh admin se contact karo.
+                    </p>
+                    <button class="btn" onclick="checkStatus()">
+                        🔄 Dobara Check Karo
+                    </button>
+                </div>
+                <iframe id="toolFrame" src="" style="display:none"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkStatus() {
+            fetch("/api/status")
+                .then(r => r.json())
+                .then(data => {
+                    const dot = document.getElementById("statusDot");
+                    const text = document.getElementById("statusText");
+                    const frame = document.getElementById("toolFrame");
+                    const offline = document.getElementById("offlineMsg");
+
+                    if (data.active && data.kaggle_url) {
+                        dot.classList.add("active");
+                        text.textContent = "✅ Tool Active — Use Karo!";
+                        frame.src = data.kaggle_url;
+                        frame.style.display = "block";
+                        offline.style.display = "none";
+                    } else {
+                        dot.classList.remove("active");
+                        text.textContent = "❌ Tool Offline Hai";
+                        frame.style.display = "none";
+                        offline.style.display = "block";
+                    }
+                })
+                .catch(() => {
+                    document.getElementById("statusText").textContent = "❌ Server Error";
+                });
+        }
+
+        checkStatus();
+        setInterval(checkStatus, 30000);
+    </script>
+</body>
+</html>
